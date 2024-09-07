@@ -16,7 +16,7 @@
 }
 /* Form Label */
 label {
-  display: block;
+  display: flex;
   margin-bottom: 5px;
 }
 /* Form Input */

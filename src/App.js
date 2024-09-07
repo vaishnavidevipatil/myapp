@@ -1,54 +1,57 @@
 import React, { useState } from "react";
 import validateField from "./components/ValidateField";
-import "./App.css"
-import "./Dashboard"
+import "./App.css";  // Ensure this file exists and contains your styles
 
-//Initialising the form fields with empty value.
+
+// Initializing the form fields with empty values.
 const initialFormData = {
   name: "",
   email: "",
   password: "",
   confirmPassword: "",
   gender: "",
-  hobbies: [],
   country: "",
+  hobbies: []  // Assuming you might want to include hobbies as an array
 };
-  
+
 const Form = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [formErrors, setFormErrors] = useState(initialFormData);
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleChange = (event) => {
-    var fieldValue;
-    const { name, value, type } = event.target;
-    
- //Checking the type of inputs is checkbox
+    const { name, value, type} = event.target;
+    let fieldValue;
+
+    // Handle checkbox input
     if (type === "checkbox") {
       if (formData.hobbies.includes(value)) {
- //Checking duplication of checkbox selection of hobby is not done using filter().
         fieldValue = formData.hobbies.filter((hobby) => hobby !== value);
       } else {
- //Updating the formData with the selected Hobbies.
         fieldValue = [...formData.hobbies, value];
       }
-    } //Checking the type of inputs is radio.
+    } 
+    // Handle radio input
     else if (type === "radio") {
       fieldValue = value;
-    } else {
+    } 
+    // Handle other input types
+    else {
       fieldValue = value.trim();
     }
-  //Updating the form data with new value from each input.
+
     setFormData({ ...formData, [name]: fieldValue });
     
-  //Validates the field by calling the validateField function from the Validate.js file, and passing the field name, value, and current form data.
+    // Validate the field
     const error = validateField(name, fieldValue, formData);
-    
- //The resulting error message is then stored in the formErrors state variable.
     setFormErrors({ ...formErrors, [name]: error });
   };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const newFormErrors = {};
-    //Validates all form fields by calling validateField for each field and storing the resulting error messages in a new object newFormErrors.
+
+    // Validate all form fields
     Object.keys(formData).forEach((fieldName) => {
       newFormErrors[fieldName] = validateField(
         fieldName,
@@ -57,19 +60,21 @@ const Form = () => {
       );
     });
     setFormErrors(newFormErrors);
-    //If any of the fields have errors, the form submission is aborted.
+
+    // If there are errors, abort form submission
     if (Object.values(newFormErrors).some((error) => error)) {
       return;
     }
+
     const dataString = Object.keys(formData)
       .map((fieldName) => `${fieldName}: ${formData[fieldName]}`)
       .join("\n");
-    // If there are no errors, an alert message is shown to the user with the form data and each data on newline.
+
     alert(`Form data:\n${dataString}`);
-    // The formData and formErrors state variables are reset to their initial values using setFormData() and setFormErrors() .
     setFormData(initialFormData);
     setFormErrors({});
   };
+
   return (
     <form id="registration-form" onSubmit={handleSubmit}>
       <h2 className="title">Registration Form</h2>
@@ -82,7 +87,6 @@ const Form = () => {
           value={formData.name}
           onChange={handleChange}
         />
-        {/* Checking whether the  formError is set for name textbox, if set displaying the corresponding error message using conditional rendering*/}
         {formErrors.name && <span className="error">{formErrors.name}</span>}
       </div>
       <div className="form-group">
@@ -94,36 +98,39 @@ const Form = () => {
           value={formData.email}
           onChange={handleChange}
         />
-        {/* Checking whether the  formError is set for email field, if set displaying the corresponding error message using conditional rendering*/}
         {formErrors.email && <span className="error">{formErrors.email}</span>}
       </div>
       <div className="form-group">
         <label htmlFor="password">Password:</label>
         <input
-          type="password"
+          type={showPassword ? "text" : "password"}
           id="password"
           name="password"
           value={formData.password}
           onChange={handleChange}
         />
-        {/* Checking whether the  formError is set for password field, if set displaying the corresponding error message using conditional rendering*/}
-        {formErrors.password && (
-          <span className="error">{formErrors.password}</span>
-        )}
+        {formErrors.password && <span className="error">{formErrors.password}</span>}
       </div>
       <div className="form-group">
         <label htmlFor="confirmPassword">Confirm Password:</label>
         <input
-          type="password"
+          type={showPassword ? "text" : "password"}
           id="confirmPassword"
           name="confirmPassword"
           value={formData.confirmPassword}
           onChange={handleChange}
         />
-        {/* Checking whether the  formError is set for confirmPassword field, if set displaying the corresponding error message using conditional rendering*/}
-        {formErrors.confirmPassword && (
-          <span className="error">{formErrors.confirmPassword}</span>
-        )}
+        {formErrors.confirmPassword && <span className="error">{formErrors.confirmPassword}</span>}
+      </div>
+      <div className="form-group">
+        <label>
+          <input
+            type="checkbox"
+            checked={showPassword}
+            onChange={() => setShowPassword(!showPassword)}
+          />
+          Show Password
+        </label>
       </div>
       <div className="form-group">
         <label>Gender:</label>
@@ -156,46 +163,7 @@ const Form = () => {
             onChange={handleChange}
           />
         </div>
-        {/* Checking whether the  formError is set for gender field, if set displaying the corresponding error message using conditional rendering*/}
-        {formErrors.gender && (
-          <span className="error">{formErrors.gender}</span>
-        )}
-      </div>
-      <div className="form-group">
-        <label>Hobbies:</label>
-        <div className="form-row">
-          <label htmlFor="reading">Reading</label>
-          <input
-            type="checkbox"
-            id="reading"
-            name="hobbies"
-            value="reading"
-            checked={formData.hobbies.includes("reading")}
-            onChange={handleChange}
-          />
-          <label htmlFor="traveling">Traveling</label>
-          <input
-            type="checkbox"
-            id="traveling"
-            name="hobbies"
-            value="traveling"
-            checked={formData.hobbies.includes("traveling")}
-            onChange={handleChange}
-          />
-          <label htmlFor="sports">Sports</label>
-          <input
-            type="checkbox"
-            id="sports"
-            name="hobbies"
-            value="sports"
-            checked={formData.hobbies.includes("sports")}
-            onChange={handleChange}
-          />
-        </div>
-        {/* Checking whether the  formError is set for hobbies field, if set, displaying the corresponding error message using conditional rendering*/}
-        {formErrors.hobbies && (
-          <span className="error">{formErrors.hobbies}</span>
-        )}
+        {formErrors.gender && <span className="error">{formErrors.gender}</span>}
       </div>
       <div className="form-group">
         <label htmlFor="country">Country:</label>
@@ -209,14 +177,13 @@ const Form = () => {
           <option value="usa">USA</option>
           <option value="canada">Canada</option>
           <option value="uk">UK</option>
+          <option value="india">India</option>
         </select>
-        {/* Checking whether the  formError is set for country field, if set, displaying the corresponding error message using conditional rendering*/}
-        {formErrors.country && (
-          <span className="error">{formErrors.country}</span>
-        )}
+        {formErrors.country && <span className="error">{formErrors.country}</span>}
       </div>
       <button type="submit">Submit</button>
     </form>
   );
 };
+
 export default Form;
